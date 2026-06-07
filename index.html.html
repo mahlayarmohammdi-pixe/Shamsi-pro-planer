@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="پلنر من">
+<meta name="theme-color" content="#ffffff">
+<title>پلنر شمسی ✦</title>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<style>
+:root {
+  --accent: #e879a0;
+  --accent2: #f0a8c0;
+  --accent-light: #fdf0f5;
+  --accent-mid: #fbdde9;
+  --white: #ffffff;
+  --bg: #fafafa;
+  --text: #1a1a2e;
+  --text2: #6b7280;
+  --text3: #9ca3af;
+  --border: #f0f0f4;
+  --border2: #e5e7eb;
+  --red: #ef4444;
+  --red-light: #fef2f2;
+  --green: #10b981;
+  --green-light: #ecfdf5;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 16px rgba(0,0,0,.07);
+  --shadow-sm: 0 1px 6px rgba(0,0,0,.05);
+  font-size: 16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);overflow:hidden;}
+body{font-family:'Vazirmatn',Tahoma,sans-serif;color:var(--text);direction:rtl;}
+button{font-family:'Vazirmatn',Tahoma,sans-serif;cursor:pointer;border:none;background:none;}
+input,textarea,select{font-family:'Vazirmatn',Tahoma,sans-serif;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── App Shell ── */
+#app{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--white);position:relative;overflow:hidden;}
+
+/* ── Status bar spacer ── */
+#statusbar{height:env(safe-area-inset-top,44px);background:var(--white);flex-shrink:0;}
+
+/* ── Top bar ── */
+#topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--white);flex-shrink:0;gap:8px;}
+#topbar-left{display:flex;align-items:center;gap:8px;}
+#topbar-title{font-size:17px;font-weight:800;color:var(--text);}
+#topbar-date{font-size:11px;color:var(--text3);}
+#btn-settings{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg);font-size:16px;}
+#btn-settings:active{opacity:.7;}
+
+/* ── View Switcher ── */
+#viewbar{display:flex;padding:0 16px 10px;gap:6px;flex-shrink:0;}
+.vbtn{flex:1;padding:7px 0;border-radius:20px;font-size:11px;font-weight:600;color:var(--text2);background:var(--bg);transition:all .2s;}
+.vbtn.active{background:var(--accent);color:#fff;}
+.vbtn:active{transform:scale(.95);}
+
+/* ── Nav row ── */
+#navrow{display:flex;align-items:center;justify-content:space-between;padding:0 16px 8px;flex-shrink:0;}
+.navbtn{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text2);}
+.navbtn:active{background:var(--border2);}
+#nav-title{font-size:15px;font-weight:700;color:var(--text);}
+
+/* ── Content scroll ── */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 100px;}
+
+/* ── Bottom Nav ── */
+#bottomnav{position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,16px);display:flex;flex-shrink:0;}
+.bnbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;color:var(--text3);padding:4px 0;}
+.bnbtn.active{color:var(--accent);}
+.bnbtn .icon{font-size:20px;line-height:1;}
+.bnbtn:active{opacity:.7;}
+
+/* ════════════════════════════════
+   MONTH VIEW — Google Calendar style
+   ════════════════════════════════ */
+.month-wrap{}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px;}
+.cal-wd{text-align:center;font-size:10px;font-weight:600;color:var(--text3);padding:3px 0;}
+.cal-wd.fri{color:var(--red);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
+.cal-cell{min-height:72px;border-top:1px solid var(--border);padding:4px 3px;cursor:pointer;position:relative;}
+.cal-cell:active{background:var(--accent-light);}
+.cal-cell.other-month .cal-num{color:var(--text3);}
+.cal-cell.holiday .cal-num{color:var(--red) !important;}
+.cal-num{font-size:12px;font-weight:600;color:var(--text);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:2px;}
+.cal-cell.today .cal-num{background:var(--accent);color:#fff;}
+.cal-cell.selected:not(.today) .cal-num{background:var(--accent-mid);color:var(--accent);}
+.cal-ev-list{display:flex;flex-direction:column;gap:1px;}
+.cal-ev-chip{font-size:9px;border-radius:3px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;}
+.cal-ev-more{font-size:9px;color:var(--text3);padding:1px 2px;}
+.cal-holi-label{font-size:8px;color:var(--red);margin-top:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+/* day panel below month */
+.day-panel{background:var(--white);border-radius:var(--radius);padding:14px;margin-top:10px;}
+.day-panel-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.today-badge{background:var(--accent);color:#fff;font-size:9px;padding:2px 8px;border-radius:20px;}
+.holi-badge{background:var(--red-light);color:var(--red);font-size:9px;padding:2px 8px;border-radius:20px;}
+
+/* ── Section headers ── */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;margin-top:12px;}
+.sec-label{font-size:11px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:5px;}
+.sec-label .ico{font-size:13px;}
+.sec-add{width:26px;height:26px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:18px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.sec-add:active{opacity:.7;}
+
+/* ── Event card ── */
+.ev-card{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border-radius:var(--radius-sm);padding:9px 10px;margin-bottom:6px;border-right:3px solid var(--accent);}
+.ev-card-body{flex:1;min-width:0;}
+.ev-card-title{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px;}
+.ev-card-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.del-btn{color:var(--text3);font-size:15px;padding:0 3px;line-height:1;}
+.del-btn:active{color:var(--red);}
+
+/* ── Task card with progress ── */
+.tk-card{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border-radius:var(--radius-sm);padding:9px 10px;margin-bottom:6px;}
+.tk-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;}
+.tk-check.done{background:var(--green);border-color:var(--green);}
+.tk-card-body{flex:1;min-width:0;}
+.tk-title{font-size:12px;color:var(--text);font-weight:500;}
+.tk-title.done{text-decoration:line-through;color:var(--text3);}
+.tk-meta{font-size:10px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:6px;}
+.tk-repeat-badge{background:var(--accent-light);color:var(--accent);font-size:9px;padding:1px 6px;border-radius:10px;}
+/* Mini progress bar */
+.tk-progress-wrap{margin-top:6px;}
+.tk-progress-label{font-size:9px;color:var(--text3);margin-bottom:3px;display:flex;justify-content:space-between;}
+.tk-progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.tk-progress-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .3s;}
+.tk-progress-controls{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.tk-prog-btn{width:22px;height:22px;border-radius:6px;background:var(--accent-light);color:var(--accent);font-size:14px;display:flex;align-items:center;justify-content:center;}
+.tk-prog-val{font-size:11px;font-weight:600;color:var(--accent);min-width:30px;text-align:center;}
+
+/* ── All-day reminders ── */
+.reminder-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-light);border-radius:20px;padding:5px 10px;margin:3px;font-size:11px;color:var(--accent);font-weight:600;}
+.reminder-chip .rdel{color:var(--accent2);font-size:13px;cursor:pointer;}
+
+/* ── Notes area ── */
+.notes-area{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--text);resize:none;outline:none;min-height:70px;direction:rtl;line-height:1.6;}
+.notes-area:focus{border-color:var(--accent);}
+
+/* ════════════════════════════════
+   WEEK VIEW
+   ════════════════════════════════ */
+.week-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px;}
+.week-col{border-radius:10px;padding:6px 3px;text-align:center;cursor:pointer;border:1px solid transparent;}
+.week-col.today{background:var(--accent);border-color:var(--accent);}
+.week-col.selected:not(.today){background:var(--accent-mid);border-color:var(--accent2);}
+.week-col.holiday .week-col-d{color:var(--red) !important;}
+.week-col-w{font-size:9px;color:var(--text3);margin-bottom:2px;}
+.week-col.today .week-col-w,.week-col.today .week-col-d{color:#fff;}
+.week-col-d{font-size:13px;font-weight:700;color:var(--text);}
+.week-col .wdot{width:4px;height:4px;border-radius:50%;background:var(--accent);margin:2px auto 0;}
+.week-col.today .wdot{background:#fff;}
+/* Week timeline */
+.week-timeline{background:var(--white);}
+.tl-row{display:flex;align-items:flex-start;gap:8px;min-height:44px;border-bottom:1px solid var(--border);}
+.tl-h{width:28px;font-size:9px;color:var(--text3);padding-top:5px;flex-shrink:0;text-align:left;}
+.tl-events{flex:1;padding:3px 0;}
+.tl-ev{border-radius:6px;padding:3px 8px;margin-bottom:2px;font-size:10px;font-weight:600;color:#fff;display:flex;justify-content:space-between;align-items:center;}
+/* Fixed classes (recurring schedule) */
+.class-chip{background:var(--accent-light);border-radius:6px;padding:4px 8px;margin-bottom:3px;font-size:10px;color:var(--accent);font-weight:600;border-right:2px solid var(--accent);}
+
+/* ════════════════════════════════
+   DAILY VIEW
+   ════════════════════════════════ */
+.daily-header{background:linear-gradient(135deg,var(--accent-light),var(--white));border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--accent-mid);}
+.daily-big-date{font-size:26px;font-weight:800;color:var(--text);}
+.daily-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* ════════════════════════════════
+   YEARLY VIEW
+   ════════════════════════════════ */
+.year-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mini-month{background:var(--white);border-radius:14px;padding:10px;cursor:pointer;border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+.mini-month:active{border-color:var(--accent);}
+.mini-month-name{font-size:11px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:5px;}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
+.mini-cell{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;}
+.mini-num{font-size:6px;color:var(--text3);}
+.mini-cell.mc-today{background:var(--accent);}
+.mini-cell.mc-today .mini-num{color:#fff;}
+.mini-cell.mc-holi .mini-num{color:var(--red);}
+.mini-cell.mc-ev{background:var(--accent-mid);}
+.mini-cell.mc-ev .mini-num{color:var(--accent);}
+
+/* ════════════════════════════════
+   HABITS TAB
+   ════════════════════════════════ */
+.habit-card{background:var(--white);border-radius:var(--radius);padding:14px;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+.habit-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.habit-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;}
+.habit-streak{font-size:11px;color:var(--text3);}
+.habit-streak strong{color:var(--accent);}
+.habit-progress-bar{height:7px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px;}
+.habit-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .4s;}
+.habit-pct{font-size:10px;color:var(--text3);margin-bottom:8px;}
+.habit-days{display:flex;gap:3px;flex-wrap:wrap;}
+.habit-day{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);cursor:pointer;}
+.habit-day.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+.habit-day.today-h{border-color:var(--accent);color:var(--accent);font-weight:700;}
+.habit-target{font-size:9px;color:var(--text3);margin-top:5px;}
+.habit-target strong{color:var(--accent);}
+
+/* ════════════════════════════════
+   GOALS TAB
+   ════════════════════════════════ */
+.goal-card{background:var(--white);border-radius:var(--radius);padding:14px;margin-bottom:10px;border:1px solid var(--border);}
+.goal-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.goal-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+.goal-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));}
+.goal-pct{font-size:10px;color:var(--text3);display:flex;justify-content:space-between;}
+.goal-steps{margin-top:8px;}
+.goal-step{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);}
+.goal-step:last-child{border-bottom:none;}
+.goal-step-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.goal-step-check.done{background:var(--accent);border-color:var(--accent);}
+.goal-step-text{font-size:11px;color:var(--text);}
+.goal-step-text.done{text-decoration:line-through;color:var(--text3);}
+
+/* ════════════════════════════════
+   CLASSES TAB
+   ════════════════════════════════ */
+.class-row{display:flex;align-items:center;gap:10px;background:var(--white);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px;border:1px solid var(--border);}
+.class-color-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.class-body{flex:1;}
+.class-name{font-size:12px;font-weight:600;color:var(--text);}
+.class-meta{font-size:10px;color:var(--text3);}
+.class-days-row{display:flex;gap:4px;margin-top:4px;}
+.class-day-pill{font-size:9px;padding:2px 7px;border-radius:10px;background:var(--accent-light);color:var(--accent);font-weight:600;}
+
+/* ════════════════════════════════
+   MODAL
+   ════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;z-index:500;}
+.modal-overlay.hidden{display:none;}
+.modal-box{width:100%;max-width:430px;margin:0 auto;background:var(--white);border-radius:24px 24px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,16px));max-height:90dvh;overflow-y:auto;}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:6px;}
+.form-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;margin-top:12px;display:block;}
+.form-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--text);outline:none;direction:rtl;}
+.form-input:focus{border-color:var(--accent);}
+.form-row{display:flex;gap:8px;}
+.form-row .form-input{flex:1;}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border .1s;}
+.color-swatch.sel{border-color:var(--text);}
+.emoji-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.emoji-btn{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+.emoji-btn.sel{border-color:var(--accent);background:var(--accent-light);}
+.form-check-row{display:flex;align-items:center;gap:8px;padding:8px 0;}
+.form-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.form-check.on{background:var(--accent);border-color:var(--accent);}
+.form-check-label{font-size:12px;color:var(--text);}
+.modal-btn{width:100%;background:var(--accent);border:none;border-radius:var(--radius-sm);padding:13px;color:#fff;font-size:14px;font-weight:700;margin-top:16px;}
+.modal-btn:active{opacity:.85;}
+.modal-btn-ghost{background:var(--bg);color:var(--text2);margin-top:8px;}
+
+/* ── Repeat days picker ── */
+.days-picker{display:flex;gap:5px;}
+.dp-day{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text2);cursor:pointer;}
+.dp-day.sel{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* ── Settings panel ── */
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.settings-label{font-size:13px;color:var(--text);}
+.accent-swatches{display:flex;gap:8px;}
+.accent-sw{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.accent-sw.sel{border-color:var(--text);}
+
+/* ── Misc ── */
+.empty{font-size:11px;color:var(--text3);text-align:center;padding:14px 0;}
+.divider{height:1px;background:var(--border);margin:10px 0;}
+.tag{display:inline-flex;align-items:center;gap:3px;background:var(--accent-light);color:var(--accent);font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.card-section{background:var(--white);border-radius:var(--radius);padding:14px;margin-bottom:10px;border:1px solid var(--border);}
+
+/* ── Animations ── */
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.slide-up{animation:slideUp .25s ease-out;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="statusbar"></div>
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div id="topbar-left">
+      <div>
+        <div id="topbar-title">پلنر من ✦</div>
+        <div id="topbar-date"></div>
+      </div>
+    </div>
+    <button id="btn-settings">⚙️</button>
+  </div>
+
+  <!-- View switcher -->
+  <div id="viewbar">
+    <button class="vbtn" data-view="daily">روزانه</button>
+    <button class="vbtn active" data-view="month">ماهانه</button>
+    <button class="vbtn" data-view="weekly">هفتگی</button>
+    <button class="vbtn" data-view="yearly">سالانه</button>
+  </div>
+
+  <!-- Nav row -->
+  <div id="navrow">
+    <button class="navbtn" id="btn-prev">›</button>
+    <div id="nav-title"></div>
+    <button class="navbtn" id="btn-next">‹</button>
+  </div>
+
+  <!-- Content -->
+  <div id="content"></div>
+
+  <!-- Bottom nav -->
+  <div id="bottomnav">
+    <button class="bnbtn active" data-tab="calendar"><div class="icon">📅</div>تقویم</button>
+    <button class="bnbtn" data-tab="habits"><div class="icon">🌱</div>عادت‌ها</button>
+    <button class="bnbtn" data-tab="goals"><div class="icon">🎯</div>اهداف</button>
+    <button class="bnbtn" data-tab="classes"><div class="icon">📚</div>کلاس‌ها</button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">➕ افزودن</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay hidden" id="settings-overlay">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ تنظیمات</div>
+    <div class="settings-row">
+      <span class="settings-label">رنگ اصلی اپ</span>
+      <div class="accent-swatches" id="accent-swatches"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">نسخه</span>
+      <span style="font-size:11px;color:var(--text3)">پلنر شمسی ۱.۰</span>
+    </div>
+    <button class="modal-btn modal-btn-ghost" onclick="document.getElementById('settings-overlay').classList.add('hidden')">بستن</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  JALALI UTILITIES
+// ════════════════════════════════════════════
+function gToJ(gy,gm,gd){
+  const g=[31,28,31,30,31,30,31,31,30,31,30,31],j=[31,31,31,31,31,31,30,30,30,30,30,29];
+  if(gy>1600)gy-=1600;else gy-=1585;
+  let gdn=365*gy+Math.floor((gy+3)/4)-Math.floor((gy+99)/100)+Math.floor((gy+399)/400);
+  for(let i=0;i<gm-1;i++)gdn+=g[i];
+  if(gm>2&&((gy%4===0&&gy%100!==0)||(gy%400===0)))gdn++;
+  gdn+=gd;
+  let jdn=gdn-79,jnp=Math.floor(jdn/12053);jdn%=12053;
+  let jy=979+33*jnp+4*Math.floor(jdn/1461);jdn%=1461;
+  if(jdn>=366){jy+=Math.floor((jdn-1)/365);jdn=(jdn-1)%365;}
+  let jm=0;for(;jm<11&&jdn>=j[jm];jm++)jdn-=j[jm];
+  return[jy,jm+1,jdn+1];
+}
+function jToG(jy,jm,jd){
+  jy+=1595;
+  let days=-355779+(365+Math.floor(jy/33)*8+Math.floor(((jy%33)+3)/4))*jy+(jm<=6?31*(jm-1):30*(jm-1)+6)+jd;
+  let gy=400*Math.floor(days/146097);days%=146097;
+  if(days>36524){gy+=100*Math.floor(--days/36524);days%=36524;if(days>=365)days++;}
+  gy+=4*Math.floor(days/1461);days%=1461;
+  if(days>365){gy+=Math.floor((days-1)/365);days=(days-1)%365;}
+  let gd=days+1;
+  const sa=[0,31,(gy%4===0&&gy%100!==0)||(gy%400===0)?29:28,31,30,31,30,31,31,30,31,30,31];
+  let gm=0;for(;gm<13&&gd>sa[gm];gm++)gd-=sa[gm];
+  return[gy,gm,gd];
+}
+function daysInM(jy,jm){if(jm<=6)return 31;if(jm<=11)return 30;return isLeap(jy)?30:29;}
+function isLeap(jy){return[1,5,9,13,17,22,26,30].includes(((jy-474)%2820+474+38)*682%2816);}
+function firstWD(jy,jm){const[gy,gm,gd]=jToG(jy,jm,1);return(new Date(gy,gm-1,gd).getDay()+1)%7;}
+function todayJ(){const n=new Date();return gToJ(n.getFullYear(),n.getMonth()+1,n.getDate());}
+function fn(n){return String(n).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]);}
+function p2(n){return fn(n).padStart(2,"۰");}
+function dk(y,m,d){return `${y}/${m}/${d}`;}
+
+const MONTHS=["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+const WDS=["ش","ی","د","س","چ","پ","ج"];
+const WDS_F=["شنبه","یکشنبه","دوشنبه","سه‌شنبه","چهارشنبه","پنجشنبه","جمعه"];
+const EMOJIS=["✦","🌸","💫","⭐","🎯","📌","💡","🔥","🌿","☁️","🎀","💎","🦋","🌙","☀️","💜","🌺","✏️","📖","🎵"];
+const COLORS_EV=["#e879a0","#f97316","#eab308","#22c55e","#06b6d4","#8b5cf6","#ec4899","#64748b","#ef4444","#0ea5e9"];
+const ACCENTS=[
+  {name:"صورتی",val:"#e879a0",light:"#fdf0f5",mid:"#fbdde9",a2:"#f0a8c0"},
+  {name:"بنفش",val:"#8b5cf6",light:"#f5f3ff",mid:"#ede9fe",a2:"#c4b5fd"},
+  {name:"آبی",val:"#0ea5e9",light:"#f0f9ff",mid:"#e0f2fe",a2:"#7dd3fc"},
+  {name:"سبز",val:"#10b981",light:"#ecfdf5",mid:"#d1fae5",a2:"#6ee7b7"},
+  {name:"نارنجی",val:"#f97316",light:"#fff7ed",mid:"#ffedd5",a2:"#fdba74"},
+];
+
+// ════════════════════════════════════════════
+//  OFFICIAL HOLIDAYS (1404)
+// ════════════════════════════════════════════
+const HOLIDAYS = {
+  "1404/1/1":"نوروز","1404/1/2":"نوروز","1404/1/3":"نوروز","1404/1/4":"نوروز",
+  "1404/1/12":"روز جمهوری اسلامی","1404/1/13":"سیزده به در",
+  "1404/2/14":"رحلت امام خمینی","1404/2/15":"قیام ۱۵ خرداد",
+  "1404/3/14":"شهادت امام علی","1404/3/31":"شهادت امام صادق",
+  "1404/4/18":"عید فطر","1404/4/19":"عید فطر",
+  "1404/5/9":"شهادت امام باقر",
+  "1404/6/20":"شهادت امام رضا",
+  "1404/6/31":"شهادت امام محمد تقی",
+  "1404/7/16":"شهادت امام علی النقی",
+  "1404/8/15":"عید قربان","1404/8/16":"عید غدیر",
+  "1404/9/25":"تاسوعا","1404/9/26":"عاشورا",
+  "1404/10/26":"اربعین",
+  "1404/11/1":"رحلت پیامبر","1404/11/2":"شهادت امام حسن",
+  "1404/11/22":"پیروزی انقلاب",
+  "1404/12/5":"ولادت امام مهدی",
+  "1404/12/29":"ملی شدن صنعت نفت",
+};
+function isHoliday(y,m,d){
+  const k=`${y}/${m}/${d}`;
+  if(HOLIDAYS[k]) return HOLIDAYS[k];
+  // Fridays
+  const[gy,gm,gd]=jToG(y,m,d);
+  if(new Date(gy,gm-1,gd).getDay()===5) return "جمعه";
+  return null;
+}
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let today=todayJ();
+let cy=today[0],cm=today[1],sd=today[2];
+let curView="month",curTab="calendar";
+let accentIdx=0;
+
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k)||d);}catch{return JSON.parse(d);}}
+let events=ld("pl_ev","{}");
+let tasks=ld("pl_tk","{}");
+let reminders=ld("pl_rm","{}"); // all-day
+let notes=ld("pl_nt","{}");
+let habits=ld("pl_hb","[]");
+let goals=ld("pl_gl","[]");
+let classes=ld("pl_cl","[]");
+accentIdx=ld("pl_acc","0");
+
+function save(){
+  localStorage.setItem("pl_ev",JSON.stringify(events));
+  localStorage.setItem("pl_tk",JSON.stringify(tasks));
+  localStorage.setItem("pl_rm",JSON.stringify(reminders));
+  localStorage.setItem("pl_nt",JSON.stringify(notes));
+  localStorage.setItem("pl_hb",JSON.stringify(habits));
+  localStorage.setItem("pl_gl",JSON.stringify(goals));
+  localStorage.setItem("pl_cl",JSON.stringify(classes));
+  localStorage.setItem("pl_acc",JSON.stringify(accentIdx));
+}
+
+function setAccent(idx){
+  accentIdx=idx;
+  const a=ACCENTS[idx];
+  document.documentElement.style.setProperty("--accent",a.val);
+  document.documentElement.style.setProperty("--accent2",a.a2);
+  document.documentElement.style.setProperty("--accent-light",a.light);
+  document.documentElement.style.setProperty("--accent-mid",a.mid);
+  document.querySelector("meta[name='theme-color']").content=a.val;
+  save();renderAccentSwatches();
+}
+setAccent(accentIdx);
+
+// ════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function getKey(){return dk(cy,cm,sd);}
+function getEvs(y,m,d){
+  const k=dk(y,m,d);
+  const base=(events[k]||[]).slice();
+  // add repeating tasks/events that fall on this weekday
+  const[gy,gm,gd]=jToG(y,m,d);
+  const wd=(new Date(gy,gm-1,gd).getDay()+1)%7;
+  classes.forEach(c=>{
+    if(c.days&&c.days.includes(wd)){
+      base.push({id:"cls_"+c.id,text:c.name,emoji:c.emoji||"📚",color:c.color,time:c.time,isClass:true});
+    }
+  });
+  return base;
+}
+function countDone(arr){return arr.filter(x=>x.done).length;}
+
+// ════════════════════════════════════════════
+//  MONTH VIEW
+// ════════════════════════════════════════════
+function renderMonth(){
+  const first=firstWD(cy,cm);
+  const days=daysInM(cy,cm);
+  // previous month overflow
+  const prevM=cm===1?12:cm-1,prevY=cm===1?cy-1:cy;
+  const prevDays=daysInM(prevY,prevM);
+
+  let html=`<div class="month-wrap">`;
+  // weekday headers
+  html+=`<div class="cal-weekdays">`;
+  WDS.forEach((w,i)=>html+=`<div class="cal-wd${i===6?" fri":""}">${w}</div>`);
+  html+=`</div><div class="cal-grid">`;
+
+  // leading empty cells
+  for(let i=0;i<first;i++){
+    const d=prevDays-first+1+i;
+    html+=`<div class="cal-cell other-month" onclick="selectDay(${prevY},${prevM},${d})">
+      <div class="cal-num">${fn(d)}</div></div>`;
+  }
+  for(let d=1;d<=days;d++){
+    const holi=isHoliday(cy,cm,d);
+    const evs=getEvs(cy,cm,d);
+    const tks=(tasks[dk(cy,cm,d)]||[]);
+    const isT=(cy===today[0]&&cm===today[1]&&d===today[2]);
+    const isSel=(d===sd);
+    let cls="cal-cell";
+    if(isT)cls+=" today";
+    if(isSel&&!isT)cls+=" selected";
+    if(holi)cls+=" holiday";
+    html+=`<div class="${cls}" onclick="selectDay(${cy},${cm},${d})">
+      <div class="cal-num">${fn(d)}</div>
+      <div class="cal-ev-list">`;
+    const visible=evs.slice(0,2);
+    visible.forEach(ev=>{
+      html+=`<div class="cal-ev-chip" style="background:${ev.color||'var(--accent)'};color:#fff">${ev.emoji?ev.emoji+" ":""}${esc(ev.text.substring(0,8))}</div>`;
+    });
+    if(evs.length>2)html+=`<div class="cal-ev-more">+${fn(evs.length-2)}</div>`;
+    if(tks.length>0)html+=`<div class="cal-ev-chip" style="background:var(--accent-light);color:var(--accent)">✓ ${fn(tks.length)}</div>`;
+    html+=`</div>`;
+    if(holi&&holi!=="جمعه")html+=`<div class="cal-holi-label">${holi}</div>`;
+    html+=`</div>`;
+  }
+  // trailing
+  const total=first+days;const rem=total%7===0?0:7-total%7;
+  for(let d=1;d<=rem;d++){
+    const nextM=cm===12?1:cm+1,nextY=cm===12?cy+1:cy;
+    html+=`<div class="cal-cell other-month" onclick="selectDay(${nextY},${nextM},${d})">
+      <div class="cal-num">${fn(d)}</div></div>`;
+  }
+  html+=`</div></div>`;
+
+  // day panel
+  html+=renderDayPanel();
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  WEEK VIEW
+// ════════════════════════════════════════════
+function renderWeek(){
+  const[gy,gm,gd]=jToG(cy,cm,sd);
+  const base=new Date(gy,gm-1,gd);
+  const dow=(base.getDay()+1)%7;
+  const weekDays=Array.from({length:7},(_,i)=>{
+    const dd=new Date(base);dd.setDate(gd-dow+i);
+    return gToJ(dd.getFullYear(),dd.getMonth()+1,dd.getDate());
+  });
+
+  // week progress
+  const totalEv=weekDays.reduce((a,[jy,jm,jd])=>a+(getEvs(jy,jm,jd).length),0);
+  const totalTk=weekDays.reduce((a,[jy,jm,jd])=>a+((tasks[dk(jy,jm,jd)]||[]).length),0);
+  const doneTk=weekDays.reduce((a,[jy,jm,jd])=>a+countDone(tasks[dk(jy,jm,jd)]||[]),0);
+  const pct=totalTk>0?Math.round(doneTk/totalTk*100):0;
+
+  let html=`<div>`;
+  // week header
+  html+=`<div class="week-header">`;
+  weekDays.forEach(([jy,jm,jd],i)=>{
+    const holi=isHoliday(jy,jm,jd);
+    const evs=getEvs(jy,jm,jd);
+    const isT=(jy===today[0]&&jm===today[1]&&jd===today[2]);
+    const isSel=(jy===cy&&jm===cm&&jd===sd);
+    let cls="week-col";
+    if(isT)cls+=" today";
+    if(isSel&&!isT)cls+=" selected";
+    if(holi)cls+=" holiday";
+    html+=`<div class="${cls}" onclick="selectDay(${jy},${jm},${jd})">
+      <div class="week-col-w">${WDS[i]}</div>
+      <div class="week-col-d">${fn(jd)}</div>
+      ${evs.length>0?`<div class="wdot"></div>`:""}
+    </div>`;
+  });
+  html+=`</div>`;
+
+  // week summary bar
+  if(totalTk>0){
+    html+=`<div style="background:var(--bg);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;">
+        <span>پیشرفت هفته 📊</span><span style="color:var(--accent);font-weight:700">${fn(pct)}٪</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px;"></div>
+      </div>
+    </div>`;
+  }
+
+  // timeline for selected day
+  html+=renderTimeline(false);
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  TIMELINE
+// ════════════════════════════════════════════
+function renderTimeline(full){
+  const evs=getEvs(cy,cm,sd);
+  const timedEvs=evs.filter(e=>e.time);
+  let html=`<div class="week-timeline">`;
+  for(let h=6;h<24;h++){
+    const hEvs=timedEvs.filter(e=>{const t=e.time||"";return parseInt(t.split(":")[0]??-1)===h;});
+    // fixed classes
+    html+=`<div class="tl-row">
+      <div class="tl-h">${p2(h)}</div>
+      <div class="tl-events">`;
+    hEvs.forEach(ev=>{
+      const end=ev.timeEnd?` — ${ev.timeEnd}`:"";
+      html+=`<div class="tl-ev" style="background:${ev.color||'var(--accent)'}">
+        <span>${ev.emoji?ev.emoji+" ":""}${esc(ev.text)}</span>
+        <span style="opacity:.7;font-size:9px">${ev.time}${end}</span>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  DAILY VIEW
+// ════════════════════════════════════════════
+function renderDaily(){
+  const holi=isHoliday(cy,cm,sd);
+  const isT=(cy===today[0]&&cm===today[1]&&sd===today[2]);
+  let html=`<div class="daily-header">
+    <div class="daily-big-date">${fn(sd)} ${MONTHS[cm-1]}</div>
+    <div class="daily-sub">${fn(cy)} • ${WDS_F[firstWD(cy,cm,sd)]}
+      ${isT?`<span class="today-badge">امروز</span>`:""}
+      ${holi&&holi!=="جمعه"?`<span class="holi-badge">🔴 ${holi}</span>`:""}
+    </div>
+  </div>`;
+  html+=renderTimeline(true);
+  html+=renderDayPanel();
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  YEARLY VIEW
+// ════════════════════════════════════════════
+function renderYearly(){
+  let html=`<div class="year-grid">`;
+  MONTHS.forEach((mn,mi)=>{
+    const m=mi+1;
+    const first=firstWD(cy,m);
+    const days=daysInM(cy,m);
+    html+=`<div class="mini-month" onclick="gotoMonth(${m})">
+      <div class="mini-month-name">${mn}</div>
+      <div class="mini-grid">`;
+    for(let i=0;i<first;i++)html+=`<div class="mini-cell"></div>`;
+    for(let d=1;d<=days;d++){
+      const k=dk(cy,m,d);
+      const holi=isHoliday(cy,m,d);
+      const hasEv=!!(events[k]?.length);
+      const isT=(cy===today[0]&&m===today[1]&&d===today[2]);
+      let cls="mini-cell";
+      if(isT)cls+=" mc-today";
+      else if(holi)cls+=" mc-holi";
+      else if(hasEv)cls+=" mc-ev";
+      html+=`<div class="${cls}"><span class="mini-num">${fn(d)}</span></div>`;
+    }
+    html+=`</div></div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  DAY PANEL
+// ════════════════════════════════════════════
+function renderDayPanel(){
+  const key=getKey();
+  const evs=events[key]||[];
+  const tks=tasks[key]||[];
+  const rms=reminders[key]||[];
+  const note=notes[key]||"";
+  const holi=isHoliday(cy,cm,sd);
+  const isT=(cy===today[0]&&cm===today[1]&&sd===today[2]);
+
+  let html=`<div class="day-panel slide-up">`;
+  html+=`<div class="day-panel-title">
+    📌 ${fn(sd)} ${MONTHS[cm-1]}
+    ${isT?`<span class="today-badge">امروز</span>`:""}
+    ${holi&&holi!=="جمعه"?`<span class="holi-badge">🔴 ${holi}</span>`:""}
+  </div>`;
+
+  // All-day reminders
+  if(rms.length>0||true){
+    html+=`<div class="sec-head">
+      <span class="sec-label"><span class="ico">🔔</span> یادآورهای روز</span>
+      <button class="sec-add" onclick="openModal('reminder')">+</button>
+    </div>`;
+    if(rms.length===0)html+=`<div class="empty">یادآوری ندارید</div>`;
+    else{
+      html+=`<div style="display:flex;flex-wrap:wrap;margin-bottom:4px;">`;
+      rms.forEach(r=>{
+        html+=`<div class="reminder-chip">${r.emoji?r.emoji+" ":""}${esc(r.text)}
+          <span class="rdel" onclick="delReminder('${key}',${r.id})">×</span>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  }
+
+  // Events
+  html+=`<div class="sec-head">
+    <span class="sec-label"><span class="ico">🗓</span> رویدادها</span>
+    <button class="sec-add" onclick="openModal('event')">+</button>
+  </div>`;
+  if(evs.length===0)html+=`<div class="empty">رویدادی نیست</div>`;
+  evs.forEach(ev=>{
+    const endT=ev.timeEnd?` ← ${ev.timeEnd}`:"";
+    html+=`<div class="ev-card" style="border-right-color:${ev.color||'var(--accent)'}">
+      <div class="ev-card-body">
+        <div class="ev-card-title">${ev.emoji?`<span>${ev.emoji}</span>`:""}${esc(ev.text)}</div>
+        ${(ev.time||ev.tag)?`<div class="ev-card-meta">${ev.time?`⏰ ${ev.time}${endT}`:""}${ev.tag?` <span class="tag">${ev.tag}</span>`:""}</div>`:""}
+      </div>
+      <button class="del-btn" onclick="delEvent('${key}',${ev.id})">×</button>
+    </div>`;
+  });
+
+  // Tasks
+  html+=`<div class="sec-head">
+    <span class="sec-label"><span class="ico">✅</span> تسک‌ها</span>
+    <button class="sec-add" onclick="openModal('task')">+</button>
+  </div>`;
+  if(tks.length===0)html+=`<div class="empty">تسکی نیست</div>`;
+  tks.forEach(tk=>{
+    html+=`<div class="tk-card">
+      <div class="tk-check${tk.done?" done":""}" onclick="toggleTask('${key}',${tk.id})">
+        ${tk.done?`<svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`:""}
+      </div>
+      <div class="tk-card-body">
+        <div class="tk-title${tk.done?" done":""}">${tk.emoji?tk.emoji+" ":""}${esc(tk.text)}
+          ${tk.repeat?`<span class="tk-repeat-badge">🔁 تکرار</span>`:""}
+        </div>`;
+    if(tk.unit&&tk.total){
+      const cur=tk.current||0;
+      const pct=Math.min(100,Math.round(cur/tk.total*100));
+      html+=`<div class="tk-progress-wrap">
+        <div class="tk-progress-label"><span>${esc(tk.unit)}: ${fn(cur)} از ${fn(tk.total)}</span><span style="color:var(--accent);font-weight:700">${fn(pct)}٪</span></div>
+        <div class="tk-progress-bar"><div class="tk-progress-fill" style="width:${pct}%"></div></div>
+        <div class="tk-progress-controls">
+          <button class="tk-prog-btn" onclick="changeProgress('${key}',${tk.id},-1)">−</button>
+          <span class="tk-prog-val">${fn(cur)}/${fn(tk.total)}</span>
+          <button class="tk-prog-btn" onclick="changeProgress('${key}',${tk.id},1)">+</button>
+        </div>
+      </div>`;
+    }
+    if(tk.meta)html+=`<div class="tk-meta">${esc(tk.meta)}</div>`;
+    html+=`</div><button class="del-btn" onclick="delTask('${key}',${tk.id})">×</button></div>`;
+  });
+
+  // Notes
+  html+=`<div class="sec-head"><span class="sec-label"><span class="ico">📝</span> یادداشت روز</span></div>`;
+  html+=`<textarea class="notes-area" placeholder="هر چیزی که به ذهنت رسید..." onchange="saveNote('${key}',this.value)">${esc(note)}</textarea>`;
+
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  HABITS TAB
+// ════════════════════════════════════════════
+function renderHabits(){
+  const HABIT_DAYS=66; // days to form a habit
+  let html=`<div>`;
+  html+=`<div class="sec-head">
+    <span class="sec-label"><span class="ico">🌱</span> ردیابی عادت‌ها</span>
+    <button class="sec-add" onclick="openModal('habit')">+</button>
+  </div>`;
+  html+=`<div style="background:var(--accent-light);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;font-size:11px;color:var(--text2);">
+    💡 پژوهش‌ها نشان می‌دهد یک رفتار پس از <strong>${fn(HABIT_DAYS)} روز</strong> به عادت تبدیل می‌شود
+  </div>`;
+  if(habits.length===0)html+=`<div class="empty">هنوز عادتی اضافه نکرده‌اید ✨</div>`;
+  habits.forEach((h,idx)=>{
+    const done=(h.log||[]).length;
+    const pct=Math.min(100,Math.round(done/HABIT_DAYS*100));
+    const todayKey=dk(today[0],today[1],today[2]);
+    const doneToday=(h.log||[]).includes(todayKey);
+    // last 14 days
+    const last14=[];
+    for(let i=13;i>=0;i--){
+      const[gy,gm,gd]=jToG(today[0],today[1],today[2]);
+      const dd=new Date(gy,gm-1,gd-i);
+      const[jy,jm,jd]=gToJ(dd.getFullYear(),dd.getMonth()+1,dd.getDate());
+      last14.push({key:dk(jy,jm,jd),jd});
+    }
+    html+=`<div class="habit-card">
+      <div class="habit-top">
+        <div class="habit-name">${h.emoji?h.emoji+" ":""}${esc(h.name)}</div>
+        <div class="habit-streak">${fn(done)} روز | <strong>${fn(pct)}٪</strong></div>
+      </div>
+      <div class="habit-progress-bar"><div class="habit-progress-fill" style="width:${pct}%"></div></div>
+      <div class="habit-pct">${fn(done)} از ${fn(HABIT_DAYS)} روز — هدف: عادت دائمی 🎯</div>
+      <div class="habit-days">`;
+    last14.forEach(({key,jd})=>{
+      const done2=(h.log||[]).includes(key);
+      const isT=key===todayKey;
+      html+=`<div class="habit-day${done2?" done":""}${isT?" today-h":""}" onclick="toggleHabit(${idx},'${key}')">${fn(jd)}</div>`;
+    });
+    html+=`</div>
+      <div class="habit-target">امروز: <strong>${doneToday?"✅ انجام شد":"⬜ انجام نشده"}</strong></div>
+      <button class="del-btn" onclick="delHabit(${idx})" style="margin-top:6px;float:left;">🗑</button>
+    </div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  GOALS TAB
+// ════════════════════════════════════════════
+function renderGoals(){
+  let html=`<div>`;
+  html+=`<div class="sec-head">
+    <span class="sec-label"><span class="ico">🎯</span> اهداف ${fn(cy)}</span>
+    <button class="sec-add" onclick="openModal('goal')">+</button>
+  </div>`;
+  if(goals.length===0)html+=`<div class="empty">هنوز هدفی ندارید 🌟</div>`;
+  goals.forEach((g,gi)=>{
+    const steps=g.steps||[];
+    const done=steps.filter(s=>s.done).length;
+    const pct=steps.length>0?Math.round(done/steps.length*100):0;
+    html+=`<div class="goal-card">
+      <div class="goal-title">${g.emoji?g.emoji+" ":""}${esc(g.title)} <span class="tag">${fn(pct)}٪</span></div>
+      <div class="goal-bar"><div class="goal-fill" style="width:${pct}%"></div></div>
+      <div class="goal-pct"><span>${fn(done)} از ${fn(steps.length)} قدم</span><span style="color:var(--text3)">${g.month?MONTHS[g.month-1]:""}</span></div>
+      <div class="goal-steps">`;
+    steps.forEach((s,si)=>{
+      html+=`<div class="goal-step">
+        <div class="goal-step-check${s.done?" done":""}" onclick="toggleGoalStep(${gi},${si})">
+          ${s.done?`<svg width="9" height="7" viewBox="0 0 9 7"><polyline points="1,3.5 3.5,6 8,1" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`:""}
+        </div>
+        <span class="goal-step-text${s.done?" done":""}">${esc(s.text)}</span>
+        <button class="del-btn" onclick="delGoalStep(${gi},${si})">×</button>
+      </div>`;
+    });
+    html+=`</div>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button onclick="addGoalStep(${gi})" style="font-size:11px;color:var(--accent);background:var(--accent-light);border-radius:8px;padding:4px 10px;">+ قدم جدید</button>
+        <button class="del-btn" onclick="delGoal(${gi})" style="margin-right:auto;">🗑</button>
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  CLASSES TAB
+// ════════════════════════════════════════════
+function renderClasses(){
+  let html=`<div>`;
+  html+=`<div class="sec-head">
+    <span class="sec-label"><span class="ico">📚</span> برنامه ثابت کلاس‌ها</span>
+    <button class="sec-add" onclick="openModal('class')">+</button>
+  </div>`;
+  html+=`<div style="background:var(--accent-light);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text2);">
+    📌 کلاس‌های ثابت به صورت خودکار در تقویم ظاهر می‌شوند
+  </div>`;
+  if(classes.length===0)html+=`<div class="empty">هنوز کلاسی اضافه نکرده‌اید</div>`;
+  WDS.forEach((wd,wi)=>{
+    const dayCls=classes.filter(c=>c.days&&c.days.includes(wi));
+    if(dayCls.length===0)return;
+    html+=`<div style="font-size:11px;font-weight:700;color:var(--text2);margin:10px 0 6px;">${WDS_F[wi]}</div>`;
+    dayCls.forEach((c,ci)=>{
+      html+=`<div class="class-row">
+        <div class="class-color-dot" style="background:${c.color||'var(--accent)'}"></div>
+        <div class="class-body">
+          <div class="class-name">${c.emoji?c.emoji+" ":""}${esc(c.name)}</div>
+          <div class="class-meta">${c.time||""}${c.location?" | "+esc(c.location):""}</div>
+        </div>
+        <button class="del-btn" onclick="delClass(${classes.indexOf(c)})">🗑</button>
+      </div>`;
+    });
+  });
+  // list without days
+  const noDays=classes.filter(c=>!c.days||c.days.length===0);
+  if(noDays.length>0){
+    html+=`<div style="font-size:11px;font-weight:700;color:var(--text2);margin:10px 0 6px;">سایر</div>`;
+    noDays.forEach(c=>{
+      html+=`<div class="class-row">
+        <div class="class-color-dot" style="background:${c.color||'var(--accent)'}"></div>
+        <div class="class-body">
+          <div class="class-name">${c.emoji?c.emoji+" ":""}${esc(c.name)}</div>
+          <div class="class-meta">${c.time||""}</div>
+        </div>
+        <button class="del-btn" onclick="delClass(${classes.indexOf(c)})">🗑</button>
+      </div>`;
+    });
+  }
+  html+=`</div>`;
+  return html;
+}
+
+// ════════════════════════════════════════════
+//  RENDER DISPATCH
+// ════════════════════════════════════════════
+function render(){
+  // Update topbar
+  document.getElementById("topbar-date").textContent=`${fn(today[0])}/${fn(today[1])}/${fn(today[2])} | امروز`;
+  // Update nav title
+  let navT="";
+  if(curView==="yearly")navT=fn(cy);
+  else navT=`${MONTHS[cm-1]} ${fn(cy)}`;
+  document.getElementById("nav-title").textContent=navT;
+  // Show/hide nav
+  const showNav=["daily","month","weekly","yearly"].includes(curView);
+  document.getElementById("navrow").style.display=showNav?"flex":"none";
+  document.getElementById("viewbar").style.display=curTab==="calendar"?"flex":"none";
+  // Bottom nav active
+  document.querySelectorAll(".bnbtn").forEach(b=>b.classList.toggle("active",b.dataset.tab===curTab));
+  document.querySelectorAll(".vbtn").forEach(b=>b.classList.toggle("active",b.dataset.view===curView));
+
+  const c=document.getElementById("content");
+  if(curTab==="calendar"){
+    if(curView==="month")c.innerHTML=renderMonth();
+    else if(curView==="weekly")c.innerHTML=renderWeek();
+    else if(curView==="daily")c.innerHTML=renderDaily();
+    else if(curView==="yearly")c.innerHTML=renderYearly();
+  } else if(curTab==="habits"){
+    c.innerHTML=renderHabits();
+  } else if(curTab==="goals"){
+    c.innerHTML=renderGoals();
+  } else if(curTab==="classes"){
+    c.innerHTML=renderClasses();
+  }
+}
+
+// ════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════
+window.selectDay=function(y,m,d){cy=y;cm=m;sd=d;curView=curView==="yearly"?"month":curView;render();}
+window.gotoMonth=function(m){cm=m;curView="month";render();}
+
+document.getElementById("btn-prev").onclick=function(){
+  if(curView==="yearly"){cy--;render();return;}
+  if(cm===1){cm=12;cy--;}else cm--;
+  render();
+}
+document.getElementById("btn-next").onclick=function(){
+  if(curView==="yearly"){cy++;render();return;}
+  if(cm===12){cm=1;cy++;}else cm++;
+  render();
+}
+document.querySelectorAll(".vbtn").forEach(b=>b.onclick=()=>{curView=b.dataset.view;render();});
+document.querySelectorAll(".bnbtn").forEach(b=>b.onclick=()=>{
+  curTab=b.dataset.tab;
+  if(curTab!=="calendar")document.getElementById("navrow").style.display="none";
+  render();
+});
+
+// ════════════════════════════════════════════
+//  ACTIONS
+// ════════════════════════════════════════════
+window.delEvent=function(k,id){events[k]=(events[k]||[]).filter(e=>e.id!==id);save();render();}
+window.delTask=function(k,id){tasks[k]=(tasks[k]||[]).filter(t=>t.id!==id);save();render();}
+window.delReminder=function(k,id){reminders[k]=(reminders[k]||[]).filter(r=>r.id!==id);save();render();}
+window.toggleTask=function(k,id){
+  tasks[k]=(tasks[k]||[]).map(t=>t.id===id?{...t,done:!t.done}:t);save();render();
+}
+window.changeProgress=function(k,id,delta){
+  tasks[k]=(tasks[k]||[]).map(t=>{
+    if(t.id===id){const v=Math.max(0,Math.min(t.total,(t.current||0)+delta));return{...t,current:v};}
+    return t;
+  });save();render();
+}
+window.saveNote=function(k,v){notes[k]=v;save();}
+window.toggleHabit=function(idx,key){
+  if(!habits[idx].log)habits[idx].log=[];
+  const i=habits[idx].log.indexOf(key);
+  if(i>=0)habits[idx].log.splice(i,1);
+  else habits[idx].log.push(key);
+  save();render();
+}
+window.delHabit=function(idx){if(confirm("حذف شود؟")){habits.splice(idx,1);save();render();}}
+window.toggleGoalStep=function(gi,si){
+  goals[gi].steps[si].done=!goals[gi].steps[si].done;save();render();
+}
+window.delGoalStep=function(gi,si){goals[gi].steps.splice(si,1);save();render();}
+window.delGoal=function(gi){if(confirm("حذف شود؟")){goals.splice(gi,1);save();render();}}
+window.addGoalStep=function(gi){
+  const t=prompt("عنوان قدم:");
+  if(!t)return;
+  if(!goals[gi].steps)goals[gi].steps=[];
+  goals[gi].steps.push({text:t,done:false});
+  save();render();
+}
+window.delClass=function(ci){if(confirm("حذف شود؟")){classes.splice(ci,1);save();render();}}
+
+// ════════════════════════════════════════════
+//  MODAL SYSTEM
+// ════════════════════════════════════════════
+let modalState={type:null,pickedColor:COLORS_EV[0],pickedEmoji:"",pickedDays:[],repeatOn:false};
+
+function buildColorSwatches(id){
+  const c=document.getElementById(id);if(!c)return;
+  c.innerHTML="";
+  COLORS_EV.forEach(col=>{
+    const d=document.createElement("div");
+    d.className="color-swatch"+(col===modalState.pickedColor?" sel":"");
+    d.style.background=col;
+    d.onclick=()=>{modalState.pickedColor=col;buildColorSwatches(id);};
+    c.appendChild(d);
+  });
+}
+function buildEmojiPicker(id){
+  const c=document.getElementById(id);if(!c)return;
+  c.innerHTML="";
+  EMOJIS.forEach(e=>{
+    const d=document.createElement("div");
+    d.className="emoji-btn"+(e===modalState.pickedEmoji?" sel":"");
+    d.textContent=e;
+    d.onclick=()=>{modalState.pickedEmoji=e===modalState.pickedEmoji?"":e;buildEmojiPicker(id);};
+    c.appendChild(d);
+  });
+}
+function buildDaysPicker(id){
+  const c=document.getElementById(id);if(!c)return;
+  c.innerHTML="";
+  WDS.forEach((w,i)=>{
+    const d=document.createElement("div");
+    d.className="dp-day"+(modalState.pickedDays.includes(i)?" sel":"");
+    d.textContent=w;
+    d.onclick=()=>{
+      const j=modalState.pickedDays.indexOf(i);
+      if(j>=0)modalState.pickedDays.splice(j,1);else modalState.pickedDays.push(i);
+      buildDaysPicker(id);
+    };
+    c.appendChild(d);
+  });
+}
+
+window.openModal=function(type){
+  modalState={type,pickedColor:COLORS_EV[0],pickedEmoji:"",pickedDays:[],repeatOn:false};
+  const overlay=document.getElementById("modal-overlay");
+  const box=document.getElementById("modal-box");
+  const title=document.getElementById("modal-title");
+  const body=document.getElementById("modal-body");
+
+  const titles={event:"🗓 رویداد جدید",task:"✅ تسک جدید",reminder:"🔔 یادآور روز",habit:"🌱 عادت جدید",goal:"🎯 هدف جدید","class":"📚 کلاس ثابت"};
+  title.textContent=titles[type]||"افزودن";
+
+  let html="";
+  if(type==="event"){
+    html=`
+      <label class="form-label">عنوان رویداد</label>
+      <input class="form-input" id="mi-text" placeholder="مثلاً: جلسه با دوستان..." autocomplete="off">
+      <label class="form-label">ایموجی</label>
+      <div class="emoji-row" id="mi-emoji"></div>
+      <label class="form-label">رنگ</label>
+      <div class="color-row" id="mi-colors"></div>
+      <label class="form-label">زمان شروع</label>
+      <div class="form-row">
+        <input class="form-input" type="time" id="mi-time">
+        <input class="form-input" type="time" id="mi-time-end" placeholder="پایان">
+      </div>
+      <label class="form-label">برچسب (اختیاری)</label>
+      <input class="form-input" id="mi-tag" placeholder="مثلاً: دانشگاه، شخصی...">
+      <button class="modal-btn" onclick="submitModal()">افزودن رویداد ✦</button>`;
+  } else if(type==="task"){
+    html=`
+      <label class="form-label">عنوان تسک</label>
+      <input class="form-input" id="mi-text" placeholder="مثلاً: خواندن فصل ۳..." autocomplete="off">
+      <label class="form-label">ایموجی</label>
+      <div class="emoji-row" id="mi-emoji"></div>
+      <label class="form-label">رنگ</label>
+      <div class="color-row" id="mi-colors"></div>
+      <div class="form-check-row">
+        <div class="form-check" id="mi-repeat-check" onclick="toggleRepeat()"></div>
+        <span class="form-check-label">🔁 تسک تکرارشونده</span>
+      </div>
+      <div id="mi-repeat-days-wrap" style="display:none">
+        <label class="form-label">روزهای تکرار</label>
+        <div class="days-picker" id="mi-days"></div>
+      </div>
+      <label class="form-label">واحد پیشرفت (اختیاری)</label>
+      <div class="form-row">
+        <input class="form-input" id="mi-unit" placeholder="مثلاً: ساعت / درس / صفحه">
+        <input class="form-input" type="number" id="mi-total" placeholder="تعداد کل">
+      </div>
+      <label class="form-label">توضیح کوتاه</label>
+      <input class="form-input" id="mi-meta" placeholder="اختیاری...">
+      <button class="modal-btn" onclick="submitModal()">افزودن تسک ✦</button>`;
+  } else if(type==="reminder"){
+    html=`
+      <label class="form-label">متن یادآور</label>
+      <input class="form-input" id="mi-text" placeholder="مثلاً: آب بخور! 💧" autocomplete="off">
+      <label class="form-label">ایموجی</label>
+      <div class="emoji-row" id="mi-emoji"></div>
+      <button class="modal-btn" onclick="submitModal()">افزودن یادآور ✦</button>`;
+  } else if(type==="habit"){
+    html=`
+      <label class="form-label">نام عادت</label>
+      <input class="form-input" id="mi-text" placeholder="مثلاً: مدیتیشن صبحگاهی..." autocomplete="off">
+      <label class="form-label">ایموجی</label>
+      <div class="emoji-row" id="mi-emoji"></div>
+      <button class="modal-btn" onclick="submitModal()">شروع ردیابی ✦</button>`;
+  } else if(type==="goal"){
+    html=`
+      <label class="form-label">عنوان هدف</label>
+      <input class="form-input" id="mi-text" placeholder="مثلاً: پایان دادن پروژه پایانی..." autocomplete="off">
+      <label class="form-label">ایموجی</label>
+      <div class="emoji-row" id="mi-emoji"></div>
+      <label class="form-label">ماه هدف</label>
+      <select class="form-input" id="mi-month">
+        <option value="">— انتخاب ماه —</option>
+        ${MONTHS.map((m,i)=>`<option value="${i+1}">${m}</option>`).join("")}
+      </select>
+      <button class="modal-btn" onclick="submitModal()">افزودن هدف ✦</button>`;
+  } else if(type==="class"){
+    html=`
+      <label class="form-label">نام کلاس / درس</label>
+      <input class="form-input" id="mi-text" placeholder="مثلاً: ریاضی ۲..." autocomplete="off">
+      <label class="form-label">ایموجی</label>
+      <div class="emoji-row" id="mi-emoji"></div>
+      <label class="form-label">رنگ</label>
+      <div class="color-row" id="mi-colors"></div>
+      <label class="form-label">روزهای هفته</label>
+      <div class="days-picker" id="mi-days"></div>
+      <label class="form-label">ساعت</label>
+      <input class="form-input" type="time" id="mi-time">
+      <label class="form-label">مکان (اختیاری)</label>
+      <input class="form-input" id="mi-location" placeholder="مثلاً: کلاس ۲۱۰...">
+      <button class="modal-btn" onclick="submitModal()">افزودن کلاس ✦</button>`;
+  }
+
+  body.innerHTML=html;
+  overlay.classList.remove("hidden");
+  box.classList.add("slide-up");
+
+  // Init pickers
+  setTimeout(()=>{
+    buildColorSwatches("mi-colors");
+    buildEmojiPicker("mi-emoji");
+    buildDaysPicker("mi-days");
+    const inp=document.getElementById("mi-text");
+    if(inp)inp.focus();
+  },50);
+}
+
+window.toggleRepeat=function(){
+  modalState.repeatOn=!modalState.repeatOn;
+  const ch=document.getElementById("mi-repeat-check");
+  if(ch)ch.className="form-check"+(modalState.repeatOn?" on":"");
+  const wrap=document.getElementById("mi-repeat-days-wrap");
+  if(wrap)wrap.style.display=modalState.repeatOn?"block":"none";
+}
+
+window.submitModal=function(){
+  const type=modalState.type;
+  const text=(document.getElementById("mi-text")||{}).value?.trim();
+  if(!text){document.getElementById("mi-text")?.focus();return;}
+  const key=getKey();
+  const id=Date.now();
+
+  if(type==="event"){
+    const ev={id,text,emoji:modalState.pickedEmoji,color:modalState.pickedColor,
+      time:(document.getElementById("mi-time")||{}).value||"",
+      timeEnd:(document.getElementById("mi-time-end")||{}).value||"",
+      tag:(document.getElementById("mi-tag")||{}).value?.trim()||""};
+    if(!events[key])events[key]=[];
+    events[key].push(ev);
+    // if repeat task, also add to selected repeat days going forward
+  } else if(type==="task"){
+    const unit=(document.getElementById("mi-unit")||{}).value?.trim();
+    const total=parseInt((document.getElementById("mi-total")||{}).value)||0;
+    const meta=(document.getElementById("mi-meta")||{}).value?.trim();
+    const tk={id,text,emoji:modalState.pickedEmoji,color:modalState.pickedColor,
+      done:false,repeat:modalState.repeatOn,repeatDays:[...modalState.pickedDays],
+      unit:unit||"",total:total||0,current:0,meta:meta||""};
+    if(!tasks[key])tasks[key]=[];
+    tasks[key].push(tk);
+    // if repeat: duplicate to all repeat days this month
+    if(modalState.repeatOn&&modalState.pickedDays.length>0){
+      const daysCount=daysInM(cy,cm);
+      for(let d=1;d<=daysCount;d++){
+        const[gy2,gm2,gd2]=jToG(cy,cm,d);
+        const wd2=(new Date(gy2,gm2-1,gd2).getDay()+1)%7;
+        if(modalState.pickedDays.includes(wd2)&&dk(cy,cm,d)!==key){
+          const k2=dk(cy,cm,d);
+          if(!tasks[k2])tasks[k2]=[];
+          tasks[k2].push({...tk,id:Date.now()+d});
+        }
+      }
+    }
+  } else if(type==="reminder"){
+    const rm={id,text,emoji:modalState.pickedEmoji};
+    if(!reminders[key])reminders[key]=[];
+    reminders[key].push(rm);
+  } else if(type==="habit"){
+    habits.push({id,name:text,emoji:modalState.pickedEmoji,log:[]});
+  } else if(type==="goal"){
+    const month=parseInt((document.getElementById("mi-month")||{}).value)||0;
+    goals.push({id,title:text,emoji:modalState.pickedEmoji,month:month||null,steps:[]});
+  } else if(type==="class"){
+    const loc=(document.getElementById("mi-location")||{}).value?.trim();
+    classes.push({id,name:text,emoji:modalState.pickedEmoji,color:modalState.pickedColor,
+      days:[...modalState.pickedDays],
+      time:(document.getElementById("mi-time")||{}).value||"",
+      location:loc||""});
+  }
+  save();
+  document.getElementById("modal-overlay").classList.add("hidden");
+  render();
+}
+
+document.getElementById("modal-overlay").onclick=function(e){
+  if(e.target===this)this.classList.add("hidden");
+}
+
+// ════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════
+function renderAccentSwatches(){
+  const c=document.getElementById("accent-swatches");if(!c)return;
+  c.innerHTML="";
+  ACCENTS.forEach((a,i)=>{
+    const d=document.createElement("div");
+    d.className="accent-sw"+(i===accentIdx?" sel":"");
+    d.style.background=a.val;
+    d.title=a.name;
+    d.onclick=()=>setAccent(i);
+    c.appendChild(d);
+  });
+}
+document.getElementById("btn-settings").onclick=function(){
+  renderAccentSwatches();
+  document.getElementById("settings-overlay").classList.remove("hidden");
+}
+document.getElementById("settings-overlay").onclick=function(e){
+  if(e.target===this)this.classList.add("hidden");
+}
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
